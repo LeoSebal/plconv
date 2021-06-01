@@ -1,0 +1,17 @@
+# Default configuration file for hydroplaylistconverter
+
+out_dir: "output"
+export_playlists: true
+
+# Encoder or path to encoder + used preset
+# make sure to use a preset compatible with the encoder
+encoder: ffmpeg
+preset: mp3-v0
+
+verbose: 0
+
+# FFMPEG conversion presets
+presets:
+  mp3-v0:   "-i \"$input\" -acodec libmp3lame -vn -ar 44100 -ac 2 -q:a 0 \"$output.mp3\""
+  mp3-320:  "-i \"$input\" -acodec libmp3lame -vn -ar 44100 -ac 2 -b:a 320 \"$output.mp3\""
+  aiff:     "-i \"$input\" -ar 44100 -ac 2 \"$output.aiff\""
