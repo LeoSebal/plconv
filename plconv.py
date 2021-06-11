@@ -66,7 +66,6 @@ def load_config(config_path:Path=Path("config.yaml")):
         config[field] = imported_config[field]
     # Convert paths to Path format
     config['out_dir'] = Path(config['out_dir'])
-    config['encoder'] = Path(config['encoder'])
     return config
 
 
@@ -174,7 +173,7 @@ def convert(audiofile, config, preset, overwrite:bool=False):
     path_out = config['out_dir'] / filename_out
     encoder_args = config['presets'][preset].replace("$input", Path(audiofile.filename).as_posix()).replace("$output", path_out.as_posix())
     ext = re.findall("\\$output(\\.[a-zA-Z0-9]*)", config["presets"][preset])[0]  # extension from preset
-    opts = {'ffmpeg': "-n -loglevel 0"}  # supplementary encoder options
+    opts = {'ffmpeg': ("-n", "-loglevel 0")}  # supplementary encoder options
 
     # Skip conversion if source is mp3 or source and target are the same
     if Path(audiofile.filename).suffix in (".mp3", ext):
@@ -187,9 +186,9 @@ def convert(audiofile, config, preset, overwrite:bool=False):
 
     else:
         if not path_out.with_suffix(ext).exists():
-            command = config['encoder'].as_posix() + " " + encoder_args
+            command = config['encoder'] + " " + encoder_args
             if config['encoder'] in opts:
-                command.append(opts[config['encoder']])
+                command = " ".join([command, *opts[config['encoder']]])
             ret = os.system(command)
             if config['verbose'] & ret!=0:
                 print(f"\tFailed to convert {audiofile.filename} to {preset}")
